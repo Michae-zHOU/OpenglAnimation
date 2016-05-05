@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-script minSpecVersion="1.000000" authoringTool="com.apple.PackageMaker" authoringToolVersion="3.0.1" authoringToolBuild="172">
+    <title>GLUI Framework</title>
+    <options customize="allow" allow-external-scripts="no" rootVolumeOnly="true"/>
+    <choices-outline>
+        <line choice="choice1"/>
+    </choices-outline>
+    <choice id="choice1" title="GLUI">
+        <pkg-ref id="com.lukecyca.gluiFramework.glui.pkg"/>
+    </choice>
+    <pkg-ref id="com.lukecyca.gluiFramework.glui.pkg" installKBytes="1580" version="1" auth="Root">file:./Contents/Packages/glui.pkg</pkg-ref>
+    <pkg-ref id="com.lukecyca.gluiFramework.glui.pkg">
+        <relocate search-id="pkmktoken6">
+            <bundle id="com.lukecyca.GLUI"/>
+        </relocate>
+    </pkg-ref>
+    <locator>
+        <search id="pkmktoken6-1" type="component">
+            <bundle CFBundleIdentifier="com.lukecyca.GLUI" path="/Library/Frameworks/GLUI.framework"/>
+        </search>
+        <search id="pkmktoken6-0" type="script" script="pkmktoken6_combined()">
+            <script>
+function pkmktoken6_combined() {
+	function pkmk_add_results_to_array(results, array) {
+		for(i = 0; i &lt; results.length; i++)
+			array.push(results[i]);
+	}
+	var result = new Array();
+	var search;
+	search = my.search.results['pkmktoken6-1'];
+	if(search) pkmk_add_results_to_array(search, result);
+	return result;
+}
+</script>
+        </search>
+        <search type="script" id="pkmktoken6" script="pkmktoken6_final()">
+            <script>
+function pkmktoken6_final() {
+	var combined = my.search.results['pkmktoken6-0'];
+	return combined;
+}
+</script>
+        </search>
+    </locator>
+</installer-script>
