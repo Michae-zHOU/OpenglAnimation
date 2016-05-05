@@ -20,10 +20,10 @@ void Rig::setSkelVisible(int visible){
         skelVisible = true;
 }
 void Rig::Draw(){
+    skin->Draw();
+    
     if(!skelVisible)
         skel->Draw();
-    
-    skin->Draw();
 }
 
 void Rig::Update(){

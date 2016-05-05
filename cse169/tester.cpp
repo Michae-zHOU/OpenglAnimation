@@ -213,7 +213,10 @@ void control_cb( int ID ){
         
         text->set_text(&(curr->name)[0]);
     }
-    channelNum->set_text(&("Channel: "+chanNum)[0]);
+    
+    if(mode == 1)
+        channelNum->set_text(&("Channel: "+chanNum)[0]);
+    
     do0->set_text(&("1: "+to_string(curr->dofs[0].Value))[0]);
     do1->set_text( &("2: "+to_string(curr->dofs[1].Value))[0]);
     do2->set_text( &("3: "+to_string(curr->dofs[2].Value))[0]);
@@ -422,7 +425,41 @@ Tester::Tester(int argc,char **argv) {
         if (_skel == NULL) {
             return;
         }
-        GLUI *glui = GLUI_Master.create_glui( "GLUI" );
+        // Open a new window for curve
+        if(mode == 1){
+            WinX2=640;
+            WinY2=480;
+            
+            glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
+            glutInitWindowSize( WinX2, WinY2 );
+            glutInitWindowPosition( WinX+1, 0 );
+            SecondWindowHandle = glutCreateWindow( "Curve" );
+            glutSetWindowTitle( "Curve" );
+            glutSetWindow( SecondWindowHandle );
+            
+            glClearColor( 0., 0., 0., 1. );
+            
+            glEnable(GL_DEPTH_TEST);                                    //Enable depth buffering
+            glClear(GL_DEPTH_BUFFER_BIT);                               //Clear depth buffer
+            
+            // Callbacks
+            glutDisplayFunc( curveDisplay );
+            glutIdleFunc( idle );
+            glutReshapeFunc( reshape );
+            glutKeyboardFunc( keyboard );
+            
+            pixels = new float[WinX2 * WinY2 * 3];
+        }
+        
+        GLUI *glui;
+  
+        if(mode == 0)
+            glui = GLUI_Master.create_glui_subwindow( WindowHandle, GLUI_SUBWINDOW_RIGHT );
+        else if(mode == 1)
+            glui = GLUI_Master.create_glui( "GLUI" , 0, WinX+WinX2, 0);
+        else
+            glui = GLUI_Master.create_glui( "GLUI");
+        
         GLUI_Panel *ep = new GLUI_Panel(glui,"",true);
         
         new GLUI_Button(ep, "Last Joint", 10,control_cb);
@@ -430,10 +467,13 @@ Tester::Tester(int argc,char **argv) {
     
         text = new GLUI_StaticText(ep, &(curr->name)[0]);
         
-        new GLUI_Button(ep, "Last Channel", 17, control_cb);
-        new GLUI_Button(ep, "Next Channel", 16, control_cb);
-        channelNum = new GLUI_StaticText(ep, &("Channel: "+to_string(chanNum))[0]);
-    
+        if(mode == 1){
+            new GLUI_Button(ep, "Last Channel", 17, control_cb);
+            new GLUI_Button(ep, "Next Channel", 16, control_cb);
+        
+            channelNum = new GLUI_StaticText(ep, &("Channel: "+to_string(chanNum))[0]);
+        }
+        
         do0 = new GLUI_StaticText(ep, &("1: "+to_string(curr->dofs[0].Value))[0]);
         new GLUI_Button(ep, "Increase", 2,control_cb);
         new GLUI_Button(ep, "Decrease", 3,control_cb);
@@ -462,33 +502,9 @@ Tester::Tester(int argc,char **argv) {
         GLUI_Checkbox* CB = new GLUI_Checkbox(ep, "Skeleton", &skelVisible, 1, control_cb);
     
         glui->set_main_gfx_window( WindowHandle );
+        
     
         GLUI_Master.set_glutIdleFunc( idle );
-        
-        if(mode == 1){
-            WinX2=640;
-            WinY2=480;
-
-            glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-            glutInitWindowSize( WinX2, WinY2 );
-            glutInitWindowPosition( WinX+1, 0 );
-            SecondWindowHandle = glutCreateWindow( "Curve" );
-            glutSetWindowTitle( "Curve" );
-            glutSetWindow( SecondWindowHandle );
-            
-            glClearColor( 0., 0., 0., 1. );
-            
-            glEnable(GL_DEPTH_TEST);                                    //Enable depth buffering
-            glClear(GL_DEPTH_BUFFER_BIT);                               //Clear depth buffer
-            
-            // Callbacks
-            glutDisplayFunc( curveDisplay );
-            glutIdleFunc( idle );
-            glutReshapeFunc( reshape );
-            glutKeyboardFunc( keyboard );
-            
-            pixels = new float[WinX2 * WinY2 * 3];
-        }
     }
     start = std::clock();
 }
@@ -727,7 +743,9 @@ void Tester::Controll(int changeJoint, int x, int y, int z, int xrot, int yrot, 
         do3->set_text( &("4: "+to_string(curr->dofs[3].Value))[0]);
         do4->set_text( &("5: "+to_string(curr->dofs[4].Value))[0]);
         do5->set_text( &("6: "+to_string(curr->dofs[5].Value))[0]);
-        channelNum->set_text(&("Channel: "+to_string(chanNum))[0]);
+        
+        if(mode == 1)
+            channelNum->set_text(&("Channel: "+to_string(chanNum))[0]);
     
         cout<<curr->name<<": "
             <<curr->dofs[0].getValue()<<" "<<curr->dofs[1].getValue()
