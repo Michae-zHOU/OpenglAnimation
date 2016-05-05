@@ -35,8 +35,8 @@ For  project3:
 
 
     Select Project: project3
-    Enter File Name: (Type in the filename without extention)
-    Enter Animation File Name: (Type in the filename without extention)
+        Enter File Name: (Type in the filename without extention)
+        Enter Animation File Name: (Type in the filename without extention)
   
     Example:
       
