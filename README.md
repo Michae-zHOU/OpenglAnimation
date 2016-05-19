@@ -43,3 +43,9 @@ For  project3:
       Select Project: project3
       Enter File Name: wasp
       Enter Animation File Name: wasp_walk
+
+For  project4: 
+
+    Select Project: project4
+    
+    Read Through the Keyboard Control For Cloth Simulation Control
