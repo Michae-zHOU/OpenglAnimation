@@ -4,7 +4,7 @@
 
 #include "tester.h"
 
-#define WINDOWTITLE	"Animation"
+#define WINDOWTITLE	"Cloth Simulation"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,8 @@ Skin* _skin;
 string filename;
 string filename1;
 string str = "/Users/ziyaozhou/Desktop/cse169/";
+string textFile = "/Users/ziyaozhou/Desktop/cse169/chinese-flag.ppm";
+string textFile1 = "/Users/ziyaozhou/Desktop/cse169/carpet-image.ppm";
 static Light light;
 static Light light1;
 int skelVisible = -1;
@@ -22,6 +24,17 @@ Joint* curr;
 int currJoint = 0;
 float DOF1;
 GLUI_StaticText* text,*channelNum,*do0,*do1,*do2,*do3,*do4,*do5;
+
+//Project4
+unsigned long lastUpdate;	// When was the last time we updated the cloth position
+Cloth* cloth;
+Cloth* ground;
+ParticleSystem* ps;
+Vector3 WindForce(0,0,0);
+Vector3 GroundColor = Vector3(0.0f, 0.7f, 0.4f);
+Vector3 initPosition = Vector3(-4, 4, -10);
+float elastic = 0.0f;
+bool started = false;		// Wait until space bar has been pressed before dropping the cloth
 
 Rig* _rig;
 AnimationPlayer* animator;
@@ -33,104 +46,6 @@ std::clock_t start;
 float duration;
 
 int chanNum = 0;
-
-void Tester::ClearBuffer()
-{
-    for (int i=0; i<WinX2*WinY2; ++i)
-    {
-        pixels[i*3]   = 0;
-        pixels[i*3+1] = 0;
-        pixels[i*3+2] = 0;
-    }  
-}
-
-void Tester::drawPoint(int x, int y, float r, float g, float b)
-{
-    int offset = y*WinX2*3 + x*3;
-    pixels[offset]   = r;
-    pixels[offset+1] = g;
-    pixels[offset+2] = b;
-}
-
-void Tester::CurveDraw() {
-    ClearBuffer();
-    
-    glViewport(0, 0, WinX2, WinY2);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    float start = animator->getStart();
-    float end = animator->getEnd();
-    float span = end - start;
-    float step = span/WinX2;
-    
-    drawPoint(0, WinY2/2, 1, 0, 0);
-    
-    if(chanNum<0)
-        chanNum = 0;
-    if(chanNum > animator->anim->numofchannel-1)
-        chanNum = animator->anim->numofchannel-1;
-
-    float offset = animator->anim->Evaluate(start, chanNum);
-    
-    for(int i = 0; i <= WinX2; i++){
-        float x = animator->anim->Evaluate(start+step*i, chanNum);
-        
-        int yOffset = WinY2/2+(int)(100*(x-offset));
-            
-        if(yOffset >= 0 && yOffset <= WinY2){
-            drawPoint(i, yOffset, 1, 0, 0);
-        }
-    }
-    
-    for(int i = 0; i<animator->anim->clist[chanNum].keysize; i++ ){
-        
-        float in = animator->anim->clist[chanNum].KeyFramelist[i].TangentIn;
-        float out = animator->anim->clist[chanNum].KeyFramelist[i].TangentOut;
-        
-        float s = animator->anim->clist[chanNum].KeyFramelist[i].Time-start;
-        int place = s/step;
-        
-        float x = animator->anim->Evaluate(start+step*place, chanNum);
-        
-        int yOffset = WinY2/2+(int)(100*(x-offset));
-        
-        if(yOffset >= 0 && yOffset <= WinY2 && place>=0 && place <= WinX2){
-            drawPoint(place, yOffset, 0, 1, 0);
-            
-            float p2 = place;
-            for(int k=0; k<40; k++){
-                place++;
-                p2--;
-                
-                float x1=x+in*step*k;
-                float x2=x+out*step*k;
-                
-                int y1 = WinY2/2+(int)(100*(x1-offset));
-                int y2 = WinY2/2+(int)(100*(x2-offset));
-                
-                if(y2 >= 0 && y2 <= WinY2 && place>=0 && place <= WinX2 && i != animator->anim->clist[chanNum].keysize-1)
-                    drawPoint(place, y2, 0, 0, 1);
-                
-                if(y1 >= 0 && y1 <= WinY2 && p2>=0 && p2 <= WinX2 && i!=0)
-                    drawPoint(p2, y1, 0, 0, 1);
-            }
-        }
-    }
-    
-    
-    glDrawPixels(WinX, WinY, GL_RGB, GL_FLOAT, pixels);
-    
-    glFinish();
-    glutSwapBuffers();
-}
-
-void Tester::Reshape(int new_width, int new_height)
-{
-    WinX2 = new_width;
-    WinY2 = new_height;
-    delete[] pixels;
-    pixels = new float[WinX2 * WinY2 * 3];
-}
 
 void control_cb( int ID ){
     if (_skel == NULL) {
@@ -206,17 +121,14 @@ void control_cb( int ID ){
         
         if (currJoint > (_skel->jointVec.size() -1))
             currJoint = _skel->jointVec.size() -1;
-   
+        
         curr->chosen = false;
         curr = _skel->jointVec.at(currJoint);
         curr->chosen = true;
         
         text->set_text(&(curr->name)[0]);
     }
-    
-    if(mode == 1)
-        channelNum->set_text(&("Channel: "+chanNum)[0]);
-    
+    channelNum->set_text(&("Channel: "+chanNum)[0]);
     do0->set_text(&("1: "+to_string(curr->dofs[0].Value))[0]);
     do1->set_text( &("2: "+to_string(curr->dofs[1].Value))[0]);
     do2->set_text( &("3: "+to_string(curr->dofs[2].Value))[0]);
@@ -339,7 +251,12 @@ int main(int argc, char **argv) {
             curr->chosen = true;
         }
     }
-    
+    else if(projectName.compare("project4") == 0){
+        mode = 2;
+    }
+    else{
+        mode = 2;
+    }
     glutInit(&argc, argv);
     
 	TESTER = new Tester(argc,argv);
@@ -382,7 +299,6 @@ Tester::Tester(int argc,char **argv) {
     glEnable(GL_DEPTH_TEST);                                    //Enable depth buffering
     glClear(GL_DEPTH_BUFFER_BIT);                               //Clear depth buffer
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);                //Set polygon drawing mode to fill front and back of each polygon
-    //glDisable(GL_CULL_FACE);                                    //Disable backface culling to render both sides of polygons
     glShadeModel(GL_SMOOTH);                                    //Set shading to smooth
     glEnable(GL_CULL_FACE);
     
@@ -404,7 +320,7 @@ Tester::Tester(int argc,char **argv) {
 	// Initialize components
 	Cam.SetAspect(float(WinX)/float(WinY));
     
-    Vector4 lightPos(0.0, 5.0, 10.0, 1.0);
+    Vector4 lightPos(0.0, 10.0, -5.0, 1.0);
     Vector4 lightPos1(-10.0, -5.0, 45.0, 0.0);
     light.position = lightPos;
     light1.position = lightPos1;
@@ -425,41 +341,7 @@ Tester::Tester(int argc,char **argv) {
         if (_skel == NULL) {
             return;
         }
-        // Open a new window for curve
-        if(mode == 1){
-            WinX2=640;
-            WinY2=480;
-            
-            glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-            glutInitWindowSize( WinX2, WinY2 );
-            glutInitWindowPosition( WinX+1, 0 );
-            SecondWindowHandle = glutCreateWindow( "Curve" );
-            glutSetWindowTitle( "Curve" );
-            glutSetWindow( SecondWindowHandle );
-            
-            glClearColor( 0., 0., 0., 1. );
-            
-            glEnable(GL_DEPTH_TEST);                                    //Enable depth buffering
-            glClear(GL_DEPTH_BUFFER_BIT);                               //Clear depth buffer
-            
-            // Callbacks
-            glutDisplayFunc( curveDisplay );
-            glutIdleFunc( idle );
-            glutReshapeFunc( reshape );
-            glutKeyboardFunc( keyboard );
-            
-            pixels = new float[WinX2 * WinY2 * 3];
-        }
-        
-        GLUI *glui;
-  
-        if(mode == 0)
-            glui = GLUI_Master.create_glui_subwindow( WindowHandle, GLUI_SUBWINDOW_RIGHT );
-        else if(mode == 1)
-            glui = GLUI_Master.create_glui( "GLUI" , 0, WinX+WinX2, 0);
-        else
-            glui = GLUI_Master.create_glui( "GLUI");
-        
+        GLUI *glui = GLUI_Master.create_glui( "GLUI" );
         GLUI_Panel *ep = new GLUI_Panel(glui,"",true);
         
         new GLUI_Button(ep, "Last Joint", 10,control_cb);
@@ -467,13 +349,10 @@ Tester::Tester(int argc,char **argv) {
     
         text = new GLUI_StaticText(ep, &(curr->name)[0]);
         
-        if(mode == 1){
-            new GLUI_Button(ep, "Last Channel", 17, control_cb);
-            new GLUI_Button(ep, "Next Channel", 16, control_cb);
-        
-            channelNum = new GLUI_StaticText(ep, &("Channel: "+to_string(chanNum))[0]);
-        }
-        
+        new GLUI_Button(ep, "Last Channel", 17, control_cb);
+        new GLUI_Button(ep, "Next Channel", 16, control_cb);
+        channelNum = new GLUI_StaticText(ep, &("Channel: "+to_string(chanNum))[0]);
+    
         do0 = new GLUI_StaticText(ep, &("1: "+to_string(curr->dofs[0].Value))[0]);
         new GLUI_Button(ep, "Increase", 2,control_cb);
         new GLUI_Button(ep, "Decrease", 3,control_cb);
@@ -502,9 +381,55 @@ Tester::Tester(int argc,char **argv) {
         GLUI_Checkbox* CB = new GLUI_Checkbox(ep, "Skeleton", &skelVisible, 1, control_cb);
     
         glui->set_main_gfx_window( WindowHandle );
-        
     
         GLUI_Master.set_glutIdleFunc( idle );
+        
+        if(mode == 1){
+            WinX2=640;
+            WinY2=480;
+
+            glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
+            glutInitWindowSize( WinX2, WinY2 );
+            glutInitWindowPosition( WinX+1, 0 );
+            SecondWindowHandle = glutCreateWindow( "Curve" );
+            glutSetWindowTitle( "Curve" );
+            glutSetWindow( SecondWindowHandle );
+            
+            glClearColor( 0.0f, 0.0f, 0.0f, 1. );
+            
+            glEnable(GL_DEPTH_TEST);                                    //Enable depth buffering
+            glClear(GL_DEPTH_BUFFER_BIT);                               //Clear depth buffer
+            
+            // Callbacks
+            glutDisplayFunc( curveDisplay );
+            glutIdleFunc( idle );
+            glutReshapeFunc( reshape );
+            glutKeyboardFunc( keyboard );
+            
+            pixels = new float[WinX2 * WinY2 * 3];
+        }
+    }
+    if(mode == 2){
+        glDisable(GL_CULL_FACE);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        Vector3 initP = Vector3();
+        
+        light.ambientColor = Color::white();
+        light.position = Vector4(0.0, 3.5, -5.0, 1.0);
+        
+        cloth = new Cloth(10,7,10,10,10.0,initPosition,&(textFile)[0]);		// The cloth fabric were operating on
+        
+        ground = new Cloth(80,80,2,2,10.0,initP,&(textFile1)[0]);
+        
+        Matrix34 move;
+        move.MakeTranslate(-20,-6,-30);
+        ground->toWorld.Dot(ground->toWorld, move);
+        
+        ps = new ParticleSystem();
+        ps->SetUp(cloth);                       // Setup cloth data
+        ps->SetGround(ground,elastic);
     }
     start = std::clock();
 }
@@ -551,7 +476,26 @@ void Tester::Update() {
         do4->set_text( &("5: "+to_string(curr->dofs[4].Value))[0]);
         do5->set_text( &("6: "+to_string(curr->dofs[5].Value))[0]);
     }
-    
+    else if(mode == 2){
+        if (started) {
+            Vector3 temp = ps->P[0].Position+cloth->toWorld.d;
+            light.position = Vector4(temp.x, temp.y, temp.z, 1) ;
+            
+            // Apply a wind force to the cloth and calculate the pull of neighbouring particles
+            ps->airForce = WindForce;
+            
+            ps->UpdateGround(ground, cloth->toWorld, elastic);
+            
+            // Get the current time so we can calculate how much time since the last update
+            // used when integrating the distance a particle has traveled
+            unsigned long currentUpdate = glutGet(GLUT_ELAPSED_TIME);
+            
+            // Move the cloth particles forward in time by how much time passed since the last update
+            ps->Update(currentUpdate-lastUpdate);
+  
+            lastUpdate = currentUpdate;
+        }
+    }
     
 	// Tell glut to re-display the scene
 	glutSetWindow(WindowHandle);
@@ -568,10 +512,17 @@ void Tester::Update() {
 void Tester::Reset() {
 	Cam.Reset();
 	Cam.SetAspect(float(WinX)/float(WinY));
-    _skel->Reset();
+    
+    if(mode == 1 || mode == 0)
+        _skel->Reset();
     
     if(mode == 1)
         start = std::clock();
+    
+    if(mode == 2){
+        cloth = new Cloth(10,7,10,10,10.0,initPosition,&(textFile)[0]);
+        ps->SetUp(cloth);
+    }
 	//Cube.Reset();
 }
 
@@ -595,8 +546,9 @@ void Tester::Draw() {
     
         if (_skin != NULL)
             _skin->Draw();
+        
     }
-    else{
+    else if(mode == 1){
         light1.diffuseColor = Color::blue();
         
         light.bind(0);
@@ -607,7 +559,26 @@ void Tester::Draw() {
         
         _rig->Draw();
     }
-	// Finish drawing scene
+    else if(mode == 2){
+        light.bind(0);
+        light1.bind(1);
+        
+        Cam.Draw();
+        Vector3 lp = Vector3(light.position[0],light.position[1],light.position[2]);
+    
+        ground->Draw();
+        cloth->Draw();
+        
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glTranslatef(lp.x,lp.y,lp.z);
+        // Red color used to draw.
+        glColor4f(0.5, 0.3, 0.2, 0.2);
+
+        // built-in (glut library) function , draw you a sphere.
+        glutSolidSphere(0.5,20,20);
+    }
+    // Finish drawing scene
 	glFinish();
 	glutSwapBuffers();
 }
@@ -633,7 +604,167 @@ void Tester::Resize(int x,int y) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Tester::Keyboard(int key,int x,int y) {
-	switch(key) {
+    if(mode == 2){
+        Matrix34 movement;
+        string st;
+        switch ( key ) {
+            case 'i':
+                light.position = light.position + Vector4(0,1.0,0,0);
+                break;
+            case 'k':
+                light.position = light.position - Vector4(0,1.0,0,0);
+                break;
+            case 'j':
+                light.position = light.position - Vector4(1,0.0,0,0);
+                break;
+            case 'l':
+                light.position = light.position + Vector4(1,0.0,0,0);
+                break;
+            case 'u':
+                light.position = light.position - Vector4(0,0.0,1,0);
+                break;
+            case 'o':
+                light.position = light.position + Vector4(0,0.0,1,0);
+                break;
+            case 'Z':
+                elastic+=0.1;
+                cout<<"Elastic: "<<elastic<<endl;
+                break;
+            case 'z':
+                elastic-=0.1;
+                cout<<"Elastic: "<<elastic<<endl;
+                break;
+            case 'w':
+                movement.MakeTranslate(0, 1, 0);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 's':
+                movement.MakeTranslate(0, -1, 0);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 'a':
+                movement.MakeTranslate(-1, 0, 0);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 'd':
+                movement.MakeTranslate(1, 0, 0);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 'q':
+                movement.MakeTranslate(0, 0, -1);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 'e':
+                movement.MakeTranslate(0, 0, 1);
+                cloth->toWorld.Dot(cloth->toWorld, movement);
+                break;
+            case 'g':
+                started = !started;
+                lastUpdate = glutGet(GLUT_ELAPSED_TIME);
+                started? cout<<"Simulation Starts."<<endl: cout<<"Simulation Pauses."<<endl;
+                break;
+            case 0x1b:		// Escape
+                cout<<"Simulation Ends."<<endl;
+                Quit();
+                break;
+            case '1':
+                cloth->sd_draw = !cloth->sd_draw;
+                break;
+            case '2':
+                ps->gravityControl = !ps->gravityControl;
+                st = (ps->gravityControl)? "On":"Off";
+                cout<<"Gravity: "<<st<<endl;
+                break;
+            case '3':
+                ps->stringDampingControl = !ps->stringDampingControl;
+                st = (ps->stringDampingControl)? "On":"Off";
+                cout<<"SpringDamping: "<< st <<endl;
+                break;
+            case '4':
+                ps->aerodynamicControl = !ps->aerodynamicControl;
+                st = (ps->aerodynamicControl)? "On":"Off";
+                cout<<"Aerodynamic: "<< st <<endl;
+                break;
+            case '5'://left side
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                for(int i=0; i<cloth->p_in_height; i++)
+                    ps->P[i*cloth->p_in_width].fixed = true;
+                break;
+            case '6'://right side
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                for(int i=0; i<cloth->p_in_height; i++)
+                    ps->P[i*cloth->p_in_width+cloth->p_in_width-1].fixed = true;
+                break;
+            case '7'://top
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                for(int i=0; i<cloth->p_in_width; i++)
+                    ps->P[i].fixed = true;
+                break;
+            case '8': //Two corner
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                ps->P[0].fixed = true;
+                ps->P[cloth->p_in_width-1].fixed = true;
+                break;
+            case '9'://Top left corner
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                ps->P[0].fixed = true;
+                break;
+            case '0'://No fixed
+                for(int i=0; i<ps->NumParticles; i++)
+                    ps->P[i].fixed = false;
+                break;
+            case ',':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position-=Vector3(0.0f, 1.0f, 0.0f);
+                break;
+            case '.':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position+=Vector3(0.0f, 1.0f, 0.0f);
+                break;
+            case '<':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position-=Vector3(0.0f, 0.0f, 1.0f);
+                break;
+            case '>':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position+=Vector3(0.0f, 0.0f, 1.0f);
+                break;
+            case 'n':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position-=Vector3(1.0f, 0.0f, 0.0f);
+                break;
+            case 'm':
+                if(ps->P[0].fixed)
+                    ps->P[0].Position+=Vector3(1.0f, 0.0f, 0.0f);
+                break;
+            case '+':
+                WindForce += Vector3(0.0f, 1.0f, 0.0f);
+                WindForce.Print("Wind");
+                break;
+            case '-':
+                WindForce -= Vector3(0.0f, 1.0f, 0.0f);
+                WindForce.Print("Wind");
+                break;
+            case ']':
+                WindForce += Vector3(0.0f, 0.0f, 1.0f);
+                WindForce.Print("Wind");
+                break;
+            case '[':
+                WindForce -= Vector3(0.0f, 0.0f, 1.0f);
+                WindForce.Print("Wind");
+                break;
+            case 'r':
+                Reset();
+                break;
+        }
+        return;
+    }
+    switch(key) {
 		case 0x1b:		// Escape
 			Quit();
 			break;
@@ -743,18 +874,13 @@ void Tester::Controll(int changeJoint, int x, int y, int z, int xrot, int yrot, 
         do3->set_text( &("4: "+to_string(curr->dofs[3].Value))[0]);
         do4->set_text( &("5: "+to_string(curr->dofs[4].Value))[0]);
         do5->set_text( &("6: "+to_string(curr->dofs[5].Value))[0]);
-        
-        if(mode == 1)
-            channelNum->set_text(&("Channel: "+to_string(chanNum))[0]);
+        channelNum->set_text(&("Channel: "+to_string(chanNum))[0]);
     
         cout<<curr->name<<": "
             <<curr->dofs[0].getValue()<<" "<<curr->dofs[1].getValue()
             <<" "<<curr->dofs[2].getValue()<<" "<<curr->dofs[3].getValue()
             <<" "<<curr->dofs[4].getValue()<<" "<<curr->dofs[5].getValue()
             <<endl;
-    }
-    else{
-    
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -794,3 +920,100 @@ void Tester::MouseMotion(int nx,int ny) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Tester::ClearBuffer()
+{
+    for (int i=0; i<WinX2*WinY2; ++i)
+    {
+        pixels[i*3]   = 0;
+        pixels[i*3+1] = 0;
+        pixels[i*3+2] = 0;
+    }
+}
+
+void Tester::drawPoint(int x, int y, float r, float g, float b)
+{
+    int offset = y*WinX2*3 + x*3;
+    pixels[offset]   = r;
+    pixels[offset+1] = g;
+    pixels[offset+2] = b;
+}
+
+void Tester::CurveDraw() {
+    ClearBuffer();
+    
+    glViewport(0, 0, WinX2, WinY2);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    float start = animator->getStart();
+    float end = animator->getEnd();
+    float span = end - start;
+    float step = span/WinX2;
+    
+    drawPoint(0, WinY2/2, 1, 0, 0);
+    
+    if(chanNum<0)
+        chanNum = 0;
+    if(chanNum > animator->anim->numofchannel-1)
+        chanNum = animator->anim->numofchannel-1;
+    
+    float offset = animator->anim->Evaluate(start, chanNum);
+    
+    for(int i = 0; i <= WinX2; i++){
+        float x = animator->anim->Evaluate(start+step*i, chanNum);
+        
+        int yOffset = WinY2/2+(int)(100*(x-offset));
+        
+        if(yOffset >= 0 && yOffset <= WinY2){
+            drawPoint(i, yOffset, 1, 0, 0);
+        }
+    }
+    
+    for(int i = 0; i<animator->anim->clist[chanNum].keysize; i++ ){
+        
+        float in = animator->anim->clist[chanNum].KeyFramelist[i].TangentIn;
+        float out = animator->anim->clist[chanNum].KeyFramelist[i].TangentOut;
+        
+        float s = animator->anim->clist[chanNum].KeyFramelist[i].Time-start;
+        int place = s/step;
+        
+        float x = animator->anim->Evaluate(start+step*place, chanNum);
+        
+        int yOffset = WinY2/2+(int)(100*(x-offset));
+        
+        if(yOffset >= 0 && yOffset <= WinY2 && place>=0 && place <= WinX2){
+            drawPoint(place, yOffset, 0, 1, 0);
+            
+            float p2 = place;
+            for(int k=0; k<40; k++){
+                place++;
+                p2--;
+                
+                float x1=x+in*step*k;
+                float x2=x+out*step*k;
+                
+                int y1 = WinY2/2+(int)(100*(x1-offset));
+                int y2 = WinY2/2+(int)(100*(x2-offset));
+                
+                if(y2 >= 0 && y2 <= WinY2 && place>=0 && place <= WinX2 && i != animator->anim->clist[chanNum].keysize-1)
+                    drawPoint(place, y2, 0, 0, 1);
+                
+                if(y1 >= 0 && y1 <= WinY2 && p2>=0 && p2 <= WinX2 && i!=0)
+                    drawPoint(p2, y1, 0, 0, 1);
+            }
+        }
+    }
+    
+    
+    glDrawPixels(WinX, WinY, GL_RGB, GL_FLOAT, pixels);
+    
+    glFinish();
+    glutSwapBuffers();
+}
+
+void Tester::Reshape(int new_width, int new_height)
+{
+    WinX2 = new_width;
+    WinY2 = new_height;
+    delete[] pixels;
+    pixels = new float[WinX2 * WinY2 * 3];
+}

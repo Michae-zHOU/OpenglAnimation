@@ -118,7 +118,8 @@ public:
 	float Mag () const {return sqrtf (Mag2 ());}
 	const Vector3 & Normalize () {return (*this /= Mag ());}
 	//@}
-
+    const Vector3 & Add (const Vector3 & a) {return (*this += a);}
+    
 	float Dot(const Vector3 & a) const					{return x*a.x+y*a.y+z*a.z;}
 	void Cross(const Vector3 & a,const Vector3 & b)		{x=a.y*b.z-a.z*b.y; y=a.z*b.x-a.x*b.z; z=a.x*b.y-a.y*b.x;}
 	void Lerp(float t,const Vector3 a,const Vector3 b)	{*this = a; *this *= 1.0f-t; x+=b.x*t; y+=b.y*t; z+=b.z*t;}

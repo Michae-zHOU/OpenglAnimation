@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F5117441CE8FD8C00CADC1F /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F5117421CE8FD8C00CADC1F /* ParticleSystem.cpp */; };
+		0F51174D1CEB8E5600CADC1F /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F51174B1CEB8E5600CADC1F /* Particle.cpp */; };
 		0F7FF1661CC76E1A0031DC17 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1621CC76E1A0031DC17 /* Color.cpp */; };
 		0F7FF1671CC76E1A0031DC17 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1641CC76E1A0031DC17 /* Light.cpp */; };
 		0F7FF16A1CC78CFB0031DC17 /* Vector4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1681CC78CFB0031DC17 /* Vector4.cpp */; };
@@ -15,7 +17,7 @@
 		0F7FF1731CCAE6AD0031DC17 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1711CCAE6AD0031DC17 /* Animation.cpp */; };
 		0F7FF1761CD728280031DC17 /* Rig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1741CD728280031DC17 /* Rig.cpp */; };
 		0F7FF17B1CD728390031DC17 /* AnimationPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1771CD728390031DC17 /* AnimationPlayer.cpp */; };
-		0F7FF17C1CD728390031DC17 /* Pose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1791CD728390031DC17 /* Pose.cpp */; };
+		0F7FF17C1CD728390031DC17 /* SpringDamper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF1791CD728390031DC17 /* SpringDamper.cpp */; };
 		0F7FF17F1CD728670031DC17 /* Channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F7FF17D1CD728670031DC17 /* Channel.cpp */; };
 		0F838D6D1CC3246800784A11 /* Skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F838D6B1CC3246800784A11 /* Skin.cpp */; };
 		0F838D721CC46F7600784A11 /* Triangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F838D6E1CC46F7600784A11 /* Triangle.cpp */; };
@@ -23,6 +25,8 @@
 		0FA1C0051CAE7BD00048DB53 /* Skeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA1C0041CAE7BD00048DB53 /* Skeleton.cpp */; };
 		0FA1C0091CAE7D3E0048DB53 /* Joint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA1C0071CAE7D3E0048DB53 /* Joint.cpp */; };
 		0FA1C00C1CAE7EDD0048DB53 /* DOF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA1C00A1CAE7EDD0048DB53 /* DOF.cpp */; };
+		0FD02CA11CEBA99900746E7C /* Cloth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD02C9F1CEBA99900746E7C /* Cloth.cpp */; };
+		0FD02CA41CED6AAE00746E7C /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD02CA21CED6AAE00746E7C /* Texture.cpp */; };
 		2CA53F790F1E9DEA00575E78 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CA53F6B0F1E9DEA00575E78 /* camera.cpp */; };
 		2CA53F7A0F1E9DEA00575E78 /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CA53F6D0F1E9DEA00575E78 /* core.cpp */; };
 		2CA53F7B0F1E9DEA00575E78 /* cube.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CA53F6F0F1E9DEA00575E78 /* cube.cpp */; };
@@ -49,6 +53,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0F5117421CE8FD8C00CADC1F /* ParticleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleSystem.cpp; sourceTree = "<group>"; };
+		0F5117431CE8FD8C00CADC1F /* ParticleSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSystem.h; sourceTree = "<group>"; };
+		0F51174B1CEB8E5600CADC1F /* Particle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particle.cpp; sourceTree = "<group>"; };
+		0F51174C1CEB8E5600CADC1F /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particle.h; sourceTree = "<group>"; };
 		0F7FF1621CC76E1A0031DC17 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
 		0F7FF1631CC76E1A0031DC17 /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
 		0F7FF1641CC76E1A0031DC17 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
@@ -64,8 +72,8 @@
 		0F7FF1751CD728280031DC17 /* Rig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rig.h; sourceTree = "<group>"; };
 		0F7FF1771CD728390031DC17 /* AnimationPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnimationPlayer.cpp; sourceTree = "<group>"; };
 		0F7FF1781CD728390031DC17 /* AnimationPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimationPlayer.h; sourceTree = "<group>"; };
-		0F7FF1791CD728390031DC17 /* Pose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Pose.cpp; sourceTree = "<group>"; };
-		0F7FF17A1CD728390031DC17 /* Pose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pose.h; sourceTree = "<group>"; };
+		0F7FF1791CD728390031DC17 /* SpringDamper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpringDamper.cpp; sourceTree = "<group>"; };
+		0F7FF17A1CD728390031DC17 /* SpringDamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpringDamper.h; sourceTree = "<group>"; };
 		0F7FF17D1CD728670031DC17 /* Channel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Channel.cpp; sourceTree = "<group>"; };
 		0F7FF17E1CD728670031DC17 /* Channel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Channel.h; sourceTree = "<group>"; };
 		0F838D6B1CC3246800784A11 /* Skin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Skin.cpp; sourceTree = "<group>"; };
@@ -80,6 +88,10 @@
 		0FA1C0081CAE7D3E0048DB53 /* Joint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Joint.h; sourceTree = "<group>"; };
 		0FA1C00A1CAE7EDD0048DB53 /* DOF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOF.cpp; sourceTree = "<group>"; };
 		0FA1C00B1CAE7EDD0048DB53 /* DOF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOF.h; sourceTree = "<group>"; };
+		0FD02C9F1CEBA99900746E7C /* Cloth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cloth.cpp; sourceTree = "<group>"; };
+		0FD02CA01CEBA99900746E7C /* Cloth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cloth.h; sourceTree = "<group>"; };
+		0FD02CA21CED6AAE00746E7C /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
+		0FD02CA31CED6AAE00746E7C /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		2CA53F6B0F1E9DEA00575E78 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		2CA53F6C0F1E9DEA00575E78 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		2CA53F6D0F1E9DEA00575E78 /* core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = core.cpp; sourceTree = "<group>"; };
@@ -130,6 +142,20 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				0FD02CA21CED6AAE00746E7C /* Texture.cpp */,
+				0FD02CA31CED6AAE00746E7C /* Texture.h */,
+				0F838D6E1CC46F7600784A11 /* Triangle.cpp */,
+				0F838D6F1CC46F7600784A11 /* Triangle.h */,
+				0FD02C9F1CEBA99900746E7C /* Cloth.cpp */,
+				0FD02CA01CEBA99900746E7C /* Cloth.h */,
+				0F7FF1791CD728390031DC17 /* SpringDamper.cpp */,
+				0F7FF17A1CD728390031DC17 /* SpringDamper.h */,
+				0F5117421CE8FD8C00CADC1F /* ParticleSystem.cpp */,
+				0F5117431CE8FD8C00CADC1F /* ParticleSystem.h */,
+				0F51174B1CEB8E5600CADC1F /* Particle.cpp */,
+				0F51174C1CEB8E5600CADC1F /* Particle.h */,
+				2CA53F730F1E9DEA00575E78 /* tester.cpp */,
+				2CA53F740F1E9DEA00575E78 /* tester.h */,
 				0F7FF16E1CCAE65D0031DC17 /* Keyframe.cpp */,
 				0F7FF16F1CCAE65D0031DC17 /* Keyframe.h */,
 				0F7FF17D1CD728670031DC17 /* Channel.cpp */,
@@ -138,22 +164,16 @@
 				0F7FF1781CD728390031DC17 /* AnimationPlayer.h */,
 				0F7FF1711CCAE6AD0031DC17 /* Animation.cpp */,
 				0F7FF1721CCAE6AD0031DC17 /* Animation.h */,
-				0F7FF1791CD728390031DC17 /* Pose.cpp */,
-				0F7FF17A1CD728390031DC17 /* Pose.h */,
 				0F7FF1741CD728280031DC17 /* Rig.cpp */,
 				0F7FF1751CD728280031DC17 /* Rig.h */,
 				0F7FF1681CC78CFB0031DC17 /* Vector4.cpp */,
 				0F7FF1691CC78CFB0031DC17 /* Vector4.h */,
 				0F7FF1621CC76E1A0031DC17 /* Color.cpp */,
 				0F7FF1631CC76E1A0031DC17 /* Color.h */,
-				2CA53F730F1E9DEA00575E78 /* tester.cpp */,
-				2CA53F740F1E9DEA00575E78 /* tester.h */,
 				0F7FF1641CC76E1A0031DC17 /* Light.cpp */,
 				0F7FF1651CC76E1A0031DC17 /* Light.h */,
 				0F838D6C1CC3246800784A11 /* Skin.h */,
 				0F838D6B1CC3246800784A11 /* Skin.cpp */,
-				0F838D6F1CC46F7600784A11 /* Triangle.h */,
-				0F838D6E1CC46F7600784A11 /* Triangle.cpp */,
 				0F838D711CC46F7600784A11 /* Vertex.h */,
 				0F838D701CC46F7600784A11 /* Vertex.cpp */,
 				0FA1C0081CAE7D3E0048DB53 /* Joint.h */,
@@ -245,16 +265,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F7FF1671CC76E1A0031DC17 /* Light.cpp in Sources */,
+				0F51174D1CEB8E5600CADC1F /* Particle.cpp in Sources */,
 				0F7FF1701CCAE65D0031DC17 /* Keyframe.cpp in Sources */,
 				0F7FF1731CCAE6AD0031DC17 /* Animation.cpp in Sources */,
 				0F7FF17F1CD728670031DC17 /* Channel.cpp in Sources */,
+				0FD02CA41CED6AAE00746E7C /* Texture.cpp in Sources */,
 				2CA53F790F1E9DEA00575E78 /* camera.cpp in Sources */,
 				2CA53F7A0F1E9DEA00575E78 /* core.cpp in Sources */,
 				0F7FF16A1CC78CFB0031DC17 /* Vector4.cpp in Sources */,
-				0F7FF17C1CD728390031DC17 /* Pose.cpp in Sources */,
+				0F7FF17C1CD728390031DC17 /* SpringDamper.cpp in Sources */,
 				0FA1C0051CAE7BD00048DB53 /* Skeleton.cpp in Sources */,
 				2CA53F7B0F1E9DEA00575E78 /* cube.cpp in Sources */,
 				0FA1C0091CAE7D3E0048DB53 /* Joint.cpp in Sources */,
+				0FD02CA11CEBA99900746E7C /* Cloth.cpp in Sources */,
 				0F7FF17B1CD728390031DC17 /* AnimationPlayer.cpp in Sources */,
 				0FA1C00C1CAE7EDD0048DB53 /* DOF.cpp in Sources */,
 				2CA53F7C0F1E9DEA00575E78 /* matrix34.cpp in Sources */,
@@ -263,6 +286,7 @@
 				2CA53F7D0F1E9DEA00575E78 /* tester.cpp in Sources */,
 				0F838D6D1CC3246800784A11 /* Skin.cpp in Sources */,
 				2CA53F7E0F1E9DEA00575E78 /* token.cpp in Sources */,
+				0F5117441CE8FD8C00CADC1F /* ParticleSystem.cpp in Sources */,
 				2CA53F7F0F1E9DEA00575E78 /* vector3.cpp in Sources */,
 				0F7FF1761CD728280031DC17 /* Rig.cpp in Sources */,
 				0F838D731CC46F7600784A11 /* Vertex.cpp in Sources */,

@@ -46,6 +46,15 @@ void Light::bind(int id)
     glLightfv(GL_LIGHT0 + bindID, GL_POSITION, position.ptr());
     
     //Setup spotlight direction, angle, and exponent here
+    if (bindID == 2) {//spot light
+        
+        GLfloat spot_direction[] = { -position[0], -position[1], -position[2] };
+        
+        glLightfv(GL_LIGHT0+bindID, GL_SPOT_DIRECTION, spot_direction);
+        
+        glLightf(GL_LIGHT0+bindID, GL_SPOT_CUTOFF, 160);
+        glLightf(GL_LIGHT0+bindID, GL_SPOT_EXPONENT, 100);
+    }
 }
 
 void Light::unbind(void)

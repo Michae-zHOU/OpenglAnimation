@@ -18,6 +18,8 @@
 #include <GLUI/glui.h>
 #include <stdio.h>
 #include <string.h>
+#include "Cloth.h"
+#include "ParticleSystem.h"
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
