@@ -48,4 +48,4 @@ For  project4:
 
     Select Project: project4
     
-    Read Through the Keyboard Control For Cloth Simulation Control
+    Read Through the Keyboard Control For Cloth Simulation Controls
